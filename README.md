@@ -8,14 +8,14 @@ This is my implementation of **Project 1: Wiki** from [CS50's Web Programming wi
  
 ## Features
  
-| Feature | What it does |
+| Feature | Behavior |
 | --- | --- |
-| **View entries** | `/wiki/<TITLE>` converts the entry's Markdown to HTML with `markdown2`. Missing entries show a custom 404 page. |
-| **Index page** | Lists every available entry as a link. |
-| **Search** | An exact match redirects straight to the entry. A partial match shows a results page listing every entry whose title contains the query. |
-| **Create page** | Write a new entry in Markdown. Titles are compared case-insensitively, so you can't create a duplicate; if one exists, an error message is shown instead. |
-| **Edit page** | Opens the entry's raw Markdown in a textarea. Saving overwrites the file and returns you to the rendered page. |
-| **Random page** | Takes you to a randomly chosen entry. |
+| **Entry page** | `/wiki/TITLE` loads the entry with `util.get_entry()`, converts its Markdown to HTML with `markdown2`, and displays it under the entry's name. If the entry doesn't exist, a custom "not found" page is shown. |
+| **Index page** | Lists every entry; each name links directly to its entry page. |
+| **Search** | The sidebar search box submits a `GET` request. A case-insensitive exact match redirects to that entry. Otherwise a results page lists every entry whose title contains the query as a substring (searching `ytho` finds `Python`), and each result links to its entry. |
+| **New page** | "Create New Page" in the sidebar opens a form with a title field and a `textarea` for Markdown content. The title is checked against existing entries case-insensitively. If one exists, an error message is shown and nothing is saved. Otherwise the entry is written to disk and you are redirected to its page. |
+| **Edit page** | Each entry page links to an edit form whose `textarea` is pre-filled with the entry's current Markdown. Saving overwrites the file and redirects back to the entry. |
+| **Random page** | "Random Page" in the sidebar redirects to a randomly chosen entry using `random.choice()`. |
  
 ---
  
@@ -29,7 +29,7 @@ git clone <your-repository-url>
 cd wiki
  
 # 2. Install dependencies
-pip3 install django markdown2
+pip install django markdown2
  
 # 3. Run the development server
 python manage.py runserver
@@ -49,7 +49,7 @@ wiki/
 │   └── urls.py                    # Includes the encyclopedia app's URLs
 │
 ├── encyclopedia/                  # Main app
-│   ├── views.py                   # Request handling for all pages
+│   ├── views.py                   # index, entry, search, newpage, randompage, edit
 │   ├── urls.py                    # App routes
 │   ├── util.py                    # list_entries, get_entry, save_entry
 │   ├── static/encyclopedia/
@@ -71,16 +71,24 @@ wiki/
  
 ## How It Works
  
-- **Storage:** Each article is a Markdown file in `entries/`. The helpers in `util.py` read, list, and write these files, so no database is needed.
-- **Rendering:** `views.py` loads an entry with `util.get_entry()` and converts it to HTML with `markdown2` before passing it to `entry.html`.
-- **Search:** The search bar submits a `GET` request. The view first checks for an exact (case-insensitive) title match, then falls back to a substring search.
-- **Create and edit:** Both use `POST` forms. New entries are saved with `util.save_entry()`; edits overwrite the existing file and redirect to the updated page.
-- **Random:** `random.choice()` picks a title from `util.list_entries()`.
+Each view in `encyclopedia/views.py` maps to one feature:
+ 
+| View | Description |
+| --- | --- |
+| `index` | Renders all titles from `util.list_entries()` as links. |
+| `entry` | Fetches the Markdown with `util.get_entry()`. Returns the not-found page if it is `None`; otherwise converts to HTML with `markdown2` and renders `entry.html`. |
+| `search` | Validates the query with a Django form, redirects on an exact case-insensitive title match, and otherwise renders `search_results.html` with every title containing the query. |
+| `newpage` | On `GET`, shows the form. On `POST`, rejects duplicate titles (case-insensitive) or saves the entry with `util.save_entry()` and redirects to it. |
+| `randompage` | Redirects to a random title from `util.list_entries()`. |
+| `edit` | On `GET`, pre-fills the form with the current Markdown. On `POST`, saves the new content and redirects to the entry. |
+ 
+Entries are plain files, so no database is needed. To add one manually, drop a Markdown file named after the title into `entries/` (for example `entries/Flask.md`) and it will appear on the index page.
+ 
 ---
  
-## Adding Entries Manually
+## Acknowledgements
  
-Drop a Markdown file named after the article title into `entries/` (for example, `entries/Flask.md`) and it will appear on the index page automatically.
+This project was built as part of [CS50's Web Programming with Python and JavaScript](https://cs50.harvard.edu/web/), taught by **Brian Yu** and **David J. Malan** at Harvard University. The project specification and starter code (including `util.py`, the base layout, and the initial project setup) are provided by CS50.
  
 ---
  
