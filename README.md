@@ -39,7 +39,7 @@ Then open <http://127.0.0.1:8000/> in your browser.
  
 ---
 ## Demo Video
-[![Watch the demo](https://img.youtube.com/vi/XB9h76ytXIE/maxresdefault.jpg)](https://youtu.be/NtPhIkxrmxo?si=1PbHuKs_qWyDx-sm)
+[![Watch the demo](https://img.youtube.com/vi/NtPhIkxrmxo/maxresdefault.jpg)](https://youtu.be/NtPhIkxrmxo?si=1PbHuKs_qWyDx-sm)
  
 ## Project Structure
  
